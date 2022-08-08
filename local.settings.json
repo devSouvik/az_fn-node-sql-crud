@@ -1,0 +1,10 @@
+{
+        "IsEncrypted": false,
+        "Values": {
+                "AzureWebJobsStorage": "",
+                "FUNCTIONS_WORKER_RUNTIME": "node",
+                "SERVER": "testserver07.database.windows.net",
+                "DATABASE": "testdb",
+                "PASSWORD": "testing@98"
+        }
+}
