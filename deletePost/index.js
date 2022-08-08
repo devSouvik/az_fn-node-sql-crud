@@ -1,16 +1,10 @@
-const { config } = require("../utility/dbconfig");
-const sql = require("mssql");
+const { deletePostHelper } = require("../operations/dbOperations");
 
 module.exports = async function (context, req) {
         try {
                 const { id } = context.bindingData;
 
-                let pool = await sql.connect(config);
-
-                await pool
-                        .request()
-                        .input("id", sql.Int, id)
-                        .execute("spDeleteItem");
+                await deletePostHelper(id, "spDeleteItem");
 
                 context.res = {
                         status: 200 /* Defaults to 200 */,

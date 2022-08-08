@@ -1,5 +1,4 @@
-const { config } = require("../utility/dbconfig");
-const sql = require("mssql");
+const { updatePostHelper } = require("../operations/dbOperations");
 
 module.exports = async function (context, req) {
         try {
@@ -23,16 +22,13 @@ module.exports = async function (context, req) {
 
                 const { id } = context.bindingData;
 
-                let pool = await sql.connect(config);
-
-                await pool
-                        .request()
-                        .input("id", sql.Int, id)
-                        .input("uname", sql.VarChar, uname)
-                        .input("title", sql.VarChar, title)
-                        .input("content", sql.VarChar, content)
-
-                        .execute("spUpdateItem");
+                await updatePostHelper(
+                        id,
+                        uname,
+                        title,
+                        content,
+                        "spUpdateItem"
+                );
 
                 context.res = {
                         status: 200 /* Defaults to 200 */,

@@ -1,15 +1,12 @@
-const { config } = require("../utility/dbconfig");
-const sql = require("mssql");
+const { getPostsHelper } = require("../operations/dbOperations");
 
 module.exports = async function (context, req) {
         try {
-                let pool = await sql.connect(config);
-
-                let result = await pool.request().execute("spGetItems");
+                let result = await getPostsHelper("spGetItems");
 
                 context.res = {
                         status: 200 /* Defaults to 200 */,
-                        body: result.recordset,
+                        body: result,
                 };
         } catch (err) {
                 // ... error checks
