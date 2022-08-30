@@ -1,4 +1,9 @@
 const { updatePostHelper } = require("../operations/dbOperations");
+const {
+        requestBodyNotFound,
+        requiredFieldsNotFound,
+        recordUpdated,
+} = require("../utility/constants");
 
 module.exports = async function (context, req) {
         try {
@@ -15,24 +20,18 @@ module.exports = async function (context, req) {
                 if (!uname && !content && !title) {
                         context.res = {
                                 status: 400,
-                                body: "please pass a  uname, title and a content",
+                                body: requiredFieldsNotFound,
                         };
                         return;
                 }
 
                 const { id } = context.bindingData;
 
-                await updatePostHelper(
-                        id,
-                        uname,
-                        title,
-                        content,
-                        "spUpdateItem"
-                );
+                await updatePostHelper(req, id, "spUpdateItem");
 
                 context.res = {
                         status: 200 /* Defaults to 200 */,
-                        body: "record updated successfully",
+                        body: recordUpdated,
                 };
         } catch (error) {
                 context.res = {

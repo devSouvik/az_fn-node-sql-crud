@@ -8,5 +8,8 @@
         },
         "devDependencies": {
                 "nodemon": "^2.0.19"
+        },
+        "dependencies": {
+                "jest": "^28.1.3"
         }
 }

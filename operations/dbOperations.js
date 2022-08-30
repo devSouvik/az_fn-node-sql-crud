@@ -1,11 +1,17 @@
 const { config } = require("../utility/dbconfig");
 const sql = require("mssql");
+const {
+        recordAdded,
+        recordDeleted,
+        recordUpdated,
+        recordNotUpdated,
+} = require("../utility/constants");
 
 // global connection pool
-// sql.connect(config, (err) => {
-//         if (err) return console.error(err);
-//         console.log("SQL DATABASE CONNECTED");
-// });
+sql.connect(config, (err) => {
+        if (err) return console.error(err);
+        console.log("SQL DATABASE CONNECTED");
+});
 
 function sqlParams(requestBody) {
         let parameters = [
@@ -18,72 +24,122 @@ function sqlParams(requestBody) {
                 {
                         name: "title",
                         type: sql.VarChar,
-                        value: requestBody.Title,
+                        value: requestBody.title,
                         output: false,
                 },
                 {
-                        name: "body",
+                        name: "content",
                         type: sql.VarChar,
-                        value: requestBody.body,
+                        value: requestBody.content,
                         output: false,
                 },
         ];
         return parameters;
 }
 
-const createPostHelper = async function (uname, title, content, spName) {
+const createPostHelper = function (req, spName) {
         try {
-                // let parameters = sqlParams(req.body);
-                let pool = await sql.connect(config);
+                let parameters = sqlParams(req.body);
 
-                await pool
-                        .request()
-                        .input("uname", sql.VarChar, uname)
-                        .input("title", sql.VarChar, title)
-                        .input("content", sql.VarChar, content)
-                        .execute(spName);
+                const request = new sql.Request();
 
-                // return request;
+                parameters.forEach((param) => {
+                        if (param.output == true) {
+                                request.output(
+                                        param.name,
+                                        param.type,
+                                        param.value
+                                );
+                        } else {
+                                request.input(
+                                        param.name,
+                                        param.type,
+                                        param.value
+                                );
+                        }
+                });
+
+                request.execute(spName, (err, request) => {
+                        if (err) {
+                                return "something went wrong : " + err.name;
+                        } else {
+                                return recordAdded;
+                        }
+                });
         } catch (error) {
                 return error.message;
         }
 };
 
-const getPostsHelper = async function (spName) {
+const getPostsHelper = function (spName) {
         try {
-                let pool = await sql.connect(config);
-                let result = await pool.request().execute(spName);
-                return result.recordset;
+                const request = new sql.Request();
+                let result = request.execute(spName);
+
+                return result;
         } catch (err) {
                 return err.message;
         }
 };
 
-const deletePostHelper = async function (id, spName) {
+const getPostByIdHelper = async function (id, spName) {
         try {
-                let pool = await sql.connect(config);
+                const request = new sql.Request();
 
-                await pool.request().input("id", sql.Int, id).execute(spName);
-
-                return "post deleted succesfully";
+                let result = await request
+                        .input("id", sql.Int, id)
+                        .execute(spName);
+                return result.recordset;
         } catch (error) {
                 return error.message;
         }
 };
 
-const updatePostHelper = async function (id, uname, title, content, spName) {
+const deletePostHelper = function (id, spName) {
         try {
-                let pool = await sql.connect(config);
+                const request = new sql.Request();
+                request.input("id", sql.Int, id).execute(spName);
 
-                await pool
-                        .request()
-                        .input("id", sql.Int, id)
-                        .input("uname", sql.VarChar, uname)
-                        .input("title", sql.VarChar, title)
-                        .input("content", sql.VarChar, content)
-                        .execute(spName);
+                return recordDeleted;
+        } catch (error) {
+                return error.message;
+        }
+};
 
-                return "record updated successfully";
+const updatePostHelper = async function (req, id, spName) {
+        try {
+                let parameters = sqlParams(req.body);
+                const request = new sql.Request();
+
+                parameters.push({
+                        name: "id",
+                        type: sql.Int,
+                        value: id,
+                });
+
+                parameters.forEach((param) => {
+                        if (param.output == true) {
+                                request.output(
+                                        param.name,
+                                        param.type,
+                                        param.value
+                                );
+                        } else {
+                                request.input(
+                                        param.name,
+                                        param.type,
+                                        param.value
+                                );
+                        }
+                });
+
+                request.execute(spName, (err, request) => {
+                        if (err) {
+                                return "something went wrong : " + err.name;
+                        } else {
+                                return recordUpdated;
+                        }
+                });
         } catch (error) {
                 return error.message;
         }
@@ -93,3 +149,4 @@ exports.getPostsHelper = getPostsHelper;
 exports.createPostHelper = createPostHelper;
 exports.deletePostHelper = deletePostHelper;
 exports.updatePostHelper = updatePostHelper;
+exports.getPostByIdHelper = getPostByIdHelper;

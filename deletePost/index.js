@@ -1,4 +1,5 @@
 const { deletePostHelper } = require("../operations/dbOperations");
+const { recordDeleted } = require("../utility/constants");
 
 module.exports = async function (context, req) {
         try {
@@ -8,7 +9,7 @@ module.exports = async function (context, req) {
 
                 context.res = {
                         status: 200 /* Defaults to 200 */,
-                        body: "post deleted succesfully",
+                        body: recordDeleted,
                 };
         } catch (error) {
                 context.res = {

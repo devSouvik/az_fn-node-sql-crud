@@ -1,20 +1,12 @@
-const { config } = require("../utility/dbconfig");
-const sql = require("mssql");
+const { getPostByIdHelper } = require("../operations/dbOperations");
 
 module.exports = async function (context, req) {
         try {
                 const { id } = context.bindingData;
 
-                let pool = await sql.connect(config);
-
-                let result = await pool
-                        .request()
-                        .input("id", sql.Int, id)
-                        .execute("spGetItemById");
-
                 context.res = {
-                        // status: 200, /* Defaults to 200 */
-                        body: result.recordset[0],
+                        status: 200 /* Defaults to 200 */,
+                        body: await getPostByIdHelper(id, "spGetItemById"),
                 };
         } catch (error) {
                 context.res = {

@@ -1,11 +1,12 @@
 const { createPostHelper } = require("../operations/dbOperations");
+const { responses } = require("../utility/constants");
 
 module.exports = async function (context, req) {
         try {
                 if (!req.body) {
                         context.res = {
                                 status: 400,
-                                body: "please pass a request body",
+                                body: responses.requestBodyNotFound,
                         };
                         return;
                 }
@@ -15,16 +16,16 @@ module.exports = async function (context, req) {
                 if (!uname || !title || !content) {
                         context.res = {
                                 status: 400,
-                                body: "please pass all the required fields",
+                                body: responses.requiredFieldsNotFound,
                         };
                         return;
                 }
 
-                await createPostHelper(uname, title, content, "spInsertItem");
+                await createPostHelper(req, "spInsertItem");
 
                 context.res = {
                         status: 200 /* Defaults to 200 */,
-                        body: "record added successfully",
+                        body: responses.recordAdded,
                 };
         } catch (err) {
                 // ... error checks
