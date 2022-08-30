@@ -1,0 +1,12 @@
+###
+GET http://localhost:7071/api/blog-post/
+
+
+POST http://localhost:7071/api/blog-post/
+
+application/json
+
+{
+    "title": "My first blog post",
+    "content": "This is my first blog post"
+}
